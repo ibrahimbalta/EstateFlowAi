@@ -57,6 +57,7 @@ export const generateListingContent = async (propertyData: any) => {
 export const generateImageURL = (prompt: string, type: 'post' | 'story') => {
   const width = type === 'post' ? 1024 : 1080;
   const height = type === 'post' ? 1024 : 1920;
-  const encodedPrompt = encodeURIComponent(prompt + ", realistic architectural photography, 8k, professional, sharp focus");
-  return `https://pollinations.ai/p/${encodedPrompt}?width=${width}&height=${height}&seed=${Math.floor(Math.random() * 10000)}&model=flux&nologo=true`;
+  // Using a faster, simpler prompt and model for instant results
+  const encodedPrompt = encodeURIComponent(prompt.slice(0, 200) + ", high resolution, architecture");
+  return `https://image.pollinations.ai/prompt/${encodedPrompt}?width=${width}&height=${height}&seed=${Math.floor(Math.random() * 1000)}&nologo=true&enhance=false`;
 };
