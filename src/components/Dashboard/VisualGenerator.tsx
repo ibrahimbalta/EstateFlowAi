@@ -9,7 +9,7 @@ import {
   Globe,
   Share2
 } from 'lucide-react';
-import { motion } from 'framer-motion';
+
 
 interface VisualGeneratorProps {
   data: any;
