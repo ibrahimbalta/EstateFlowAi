@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { Upload, MapPin, Tag, Maximize, FileText, ChevronRight } from 'lucide-react';
-import { motion } from 'framer-motion';
 
 interface ListingFormProps {
   onSubmit: (data: any) => void;

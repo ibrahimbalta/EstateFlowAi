@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Sparkles, Mail, Lock, Chrome, ArrowLeft } from 'lucide-react';
+import { Sparkles, Mail, Lock, Globe, ArrowLeft } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { supabase } from '../../lib/supabase';
 
@@ -132,7 +132,7 @@ const AuthPage: React.FC<{ mode: 'login' | 'signup' }> = ({ mode }) => {
           onClick={handleGoogleLogin}
           style={{ width: '100%', background: 'white', color: 'black', border: 'none', padding: '14px', borderRadius: '12px', fontWeight: '600', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '12px' }}
         >
-          <Chrome size={20} /> Google ile Devam Et
+          <Globe size={20} /> Google ile Devam Et
         </button>
 
         <div style={{ textAlign: 'center', marginTop: '32px', fontSize: '14px', color: 'var(--text-muted)' }}>
