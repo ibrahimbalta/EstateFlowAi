@@ -2,9 +2,11 @@ import { GoogleGenerativeAI } from "@google/generative-ai";
 
 // Initialize Gemini (User will need to provide VITE_GEMINI_API_KEY)
 const genAI = new GoogleGenerativeAI(import.meta.env.VITE_GEMINI_API_KEY || "");
-const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
 export const generateListingContent = async (propertyData: any) => {
+  // Initialize model inside function to ensure environment variables are loaded
+  const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+
   const prompt = `
     Sen bir gayrimenkul pazarlama uzmanısın. Aşağıdaki bilgilere sahip bir mülk için profesyonel bir ilan paketi hazırla.
     Mülk Tipi: ${propertyData.type}
