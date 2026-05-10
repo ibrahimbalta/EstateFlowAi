@@ -65,7 +65,7 @@ function Dashboard() {
 
     } catch (err: any) {
       console.error(err);
-      setError("Üretim sırasında bir hata oluştu. Lütfen API anahtarlarınızı kontrol edin.");
+      setError(err.message || "Üretim sırasında bir hata oluştu. Lütfen tekrar deneyin.");
       setIsGenerating(false);
     }
   };

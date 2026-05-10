@@ -25,30 +25,20 @@ export const generateListingContent = async (propertyData: any) => {
   `;
 
   try {
-    const response = await fetch('https://text.pollinations.ai/', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        messages: [
-          { role: 'system', content: systemPrompt },
-          { role: 'user', content: userPrompt }
-        ],
-        model: 'mistral',
-        jsonMode: true
-      })
-    });
+    const encodedPrompt = encodeURIComponent(userPrompt);
+    const response = await fetch(`https://text.pollinations.ai/${encodedPrompt}?model=mistral&system=${encodeURIComponent(systemPrompt)}`);
 
-    if (!response.ok) throw new Error('AI Service failed');
+    if (!response.ok) throw new Error('Yapay zeka servisi şu an yanıt vermiyor.');
     
     const text = await response.text();
     // Extract JSON (sometimes models add extra text)
     const jsonMatch = text.match(/\{[\s\S]*\}/);
-    if (!jsonMatch) throw new Error('Invalid AI response format');
+    if (!jsonMatch) throw new Error('Yapay zekadan geçersiz bir cevap geldi.');
     
     return JSON.parse(jsonMatch[0]);
-  } catch (error) {
+  } catch (error: any) {
     console.error("AI Generation Error:", error);
-    throw error;
+    throw new Error(error.message || "İlan üretilirken bir hata oluştu.");
   }
 };
 
