@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Check, Star, Layout, Palette, Image as ImageIcon } from 'lucide-react';
+import { Check, Star, Layout, Palette } from 'lucide-react';
 
 const templates = [
   {
