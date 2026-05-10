@@ -38,9 +38,9 @@ function Dashboard() {
       // 1. Generate Text Content via Gemini
       const aiContent = await generateListingContent(formData);
       
-      // 2. Generate Image URLs via Pollinations
-      const postUrl = generateImageURL(aiContent.imagePrompt, 'post');
-      const storyUrl = generateImageURL(aiContent.imagePrompt, 'story');
+      // 2. Generate Image URLs (Use uploaded photo if available)
+      const postUrl = formData.photo ? formData.photo : generateImageURL(aiContent.imagePrompt, 'post');
+      const storyUrl = formData.photo ? formData.photo : generateImageURL(aiContent.imagePrompt, 'story');
 
       const fullData = {
         ...formData,
