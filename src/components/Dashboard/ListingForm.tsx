@@ -15,10 +15,23 @@ const ListingForm: React.FC<ListingFormProps> = ({ onSubmit }) => {
     description: '',
     features: ''
   });
+  const [preview, setPreview] = useState<string | null>(null);
+  const fileInputRef = React.useRef<HTMLInputElement>(null);
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setPreview(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onSubmit(formData);
+    onSubmit({...formData, image: preview});
   };
 
   return (
@@ -107,17 +120,42 @@ const ListingForm: React.FC<ListingFormProps> = ({ onSubmit }) => {
         />
       </div>
 
-      <div className="upload-section" style={{ 
-        border: '2px dashed var(--border)', 
-        borderRadius: '16px', 
-        padding: '40px', 
-        textAlign: 'center',
-        background: 'rgba(255, 255, 255, 0.01)',
-        cursor: 'pointer'
-      }}>
-        <Upload style={{ marginBottom: '12px', color: 'var(--primary)' }} />
-        <h4 style={{ marginBottom: '4px' }}>Fotoğraf Yükle</h4>
-        <p style={{ color: 'var(--text-muted)', fontSize: '14px' }}>Sürükleyip bırakın veya seçmek için tıklayın</p>
+      <input 
+        type="file" 
+        ref={fileInputRef} 
+        onChange={handleFileChange} 
+        accept="image/*" 
+        style={{ display: 'none' }} 
+      />
+
+      <div 
+        className="upload-section" 
+        onClick={() => fileInputRef.current?.click()}
+        style={{ 
+          border: '2px dashed var(--border)', 
+          borderRadius: '16px', 
+          padding: preview ? '10px' : '40px', 
+          textAlign: 'center',
+          background: 'rgba(255, 255, 255, 0.01)',
+          cursor: 'pointer',
+          overflow: 'hidden',
+          position: 'relative',
+          minHeight: '160px',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center'
+        }}
+      >
+        {preview ? (
+          <img src={preview} alt="Preview" style={{ width: '100%', height: '200px', objectFit: 'cover', borderRadius: '12px' }} />
+        ) : (
+          <>
+            <Upload style={{ marginBottom: '12px', color: 'var(--primary)' }} />
+            <h4 style={{ marginBottom: '4px' }}>Fotoğraf Yükle</h4>
+            <p style={{ color: 'var(--text-muted)', fontSize: '14px' }}>Sürükleyip bırakın veya seçmek için tıklayın</p>
+          </>
+        )}
       </div>
 
       <button 
