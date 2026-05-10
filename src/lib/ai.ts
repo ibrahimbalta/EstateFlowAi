@@ -1,57 +1,60 @@
-import { GoogleGenerativeAI } from "@google/generative-ai";
-
-// Initialize Gemini (User will need to provide VITE_GEMINI_API_KEY)
-const genAI = new GoogleGenerativeAI(import.meta.env.VITE_GEMINI_API_KEY || "");
+/**
+ * EstateFlow AI - AI Service Module (Pollinations Powered)
+ * This module handles both text and image generation using Pollinations AI.
+ * No API keys required for better stability and global access.
+ */
 
 export const generateListingContent = async (propertyData: any) => {
-  const prompt = `
-    Sen bir gayrimenkul pazarlama uzmanısın. Aşağıdaki bilgilere sahip bir mülk için profesyonel bir ilan paketi hazırla.
+  const systemPrompt = "Sen bir gayrimenkul pazarlama uzmanısın. Sadece JSON formatında cevap ver.";
+  const userPrompt = `
+    Aşağıdaki bilgilere sahip bir mülk için profesyonel bir ilan paketi hazırla.
     Mülk Tipi: ${propertyData.type}
     Lokasyon: ${propertyData.location}
     Fiyat: ${propertyData.price}
     m²: ${propertyData.size}
     Özellikler: ${propertyData.features || "Belirtilmedi"}
 
-    Lütfen şu formatta JSON çıktısı ver (Sadece JSON objesini döndür, başka açıklama yazma):
+    Lütfen tam olarak şu JSON formatında cevap ver (Başka hiçbir açıklama yazma):
     {
-      "seoTitle": "Sahibinden/Hepsiemlak için çarpıcı bir başlık",
-      "seoDescription": "SEO uyumlu, anahtar kelime zengin, satış odaklı detaylı açıklama",
-      "whatsappMessage": "WhatsApp grupları için kısa ve etkileyici mesaj",
-      "hashtags": ["hashtag1", "hashtag2", "..."],
+      "seoTitle": "Çarpıcı ilan başlığı",
+      "seoDescription": "SEO uyumlu detaylı açıklama",
+      "whatsappMessage": "Kısa etkileyici mesaj",
+      "hashtags": ["hashtag1", "hashtag2"],
       "imagePrompt": "Detailed English prompt for high-end real estate architectural photography"
     }
   `;
 
-  // Try multiple models in case one is restricted in the user's region
-  const modelsToTry = ["gemini-1.5-flash", "gemini-pro"];
-  let lastError = null;
+  try {
+    const response = await fetch('https://text.pollinations.ai/', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        messages: [
+          { role: 'system', content: systemPrompt },
+          { role: 'user', content: userPrompt }
+        ],
+        model: 'mistral',
+        jsonMode: true
+      })
+    });
 
-  for (const modelName of modelsToTry) {
-    try {
-      console.log(`AI generation attempting with model: ${modelName}`);
-      const model = genAI.getGenerativeModel({ model: modelName });
-      const result = await model.generateContent(prompt);
-      const response = await result.response;
-      const text = response.text();
-      
-      // Clean JSON formatting
-      const jsonStr = text.replace(/```json|```/g, "").trim();
-      return JSON.parse(jsonStr);
-    } catch (error) {
-      console.warn(`Model ${modelName} failed, trying next...`, error);
-      lastError = error;
-      continue; // Try next model
-    }
+    if (!response.ok) throw new Error('AI Service failed');
+    
+    const text = await response.text();
+    // Extract JSON (sometimes models add extra text)
+    const jsonMatch = text.match(/\{[\s\S]*\}/);
+    if (!jsonMatch) throw new Error('Invalid AI response format');
+    
+    return JSON.parse(jsonMatch[0]);
+  } catch (error) {
+    console.error("AI Generation Error:", error);
+    throw error;
   }
-
-  // If all models fail
-  console.error("All AI models failed:", lastError);
-  throw lastError;
 };
 
 export const generateImageURL = (prompt: string, type: 'post' | 'story') => {
   const width = type === 'post' ? 1024 : 1080;
   const height = type === 'post' ? 1024 : 1920;
-  const encodedPrompt = encodeURIComponent(prompt + ", architectural photography, high-end real estate, 8k, professional lighting");
+  const encodedPrompt = encodeURIComponent(prompt + ", architectural photography, high-end real estate, ultra-realistic, 8k, professional lighting");
   return `https://pollinations.ai/p/${encodedPrompt}?width=${width}&height=${height}&seed=${Math.floor(Math.random() * 1000)}&model=flux`;
 };
