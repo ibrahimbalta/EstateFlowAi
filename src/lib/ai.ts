@@ -1,11 +1,10 @@
 /**
- * EstateFlow AI - AI Service Module (Pollinations Powered)
- * This module handles both text and image generation using Pollinations AI.
- * No API keys required for better stability and global access.
+ * EstateFlow AI - AI Service Module (Robust Pollinations Edition)
+ * Handles large property descriptions and ensures stable JSON responses.
  */
 
 export const generateListingContent = async (propertyData: any) => {
-  const systemPrompt = "Sen bir gayrimenkul pazarlama uzmanısın. Sadece JSON formatında cevap ver.";
+  const systemPrompt = "Sen bir gayrimenkul pazarlama uzmanısın. Sadece JSON formatında cevap ver. Başka hiçbir açıklama yazma.";
   const userPrompt = `
     Aşağıdaki bilgilere sahip bir mülk için profesyonel bir ilan paketi hazırla.
     Mülk Tipi: ${propertyData.type}
@@ -14,7 +13,7 @@ export const generateListingContent = async (propertyData: any) => {
     m²: ${propertyData.size}
     Özellikler: ${propertyData.features || "Belirtilmedi"}
 
-    Lütfen tam olarak şu JSON formatında cevap ver (Başka hiçbir açıklama yazma):
+    Lütfen tam olarak şu JSON formatında cevap ver:
     {
       "seoTitle": "Çarpıcı ilan başlığı",
       "seoDescription": "SEO uyumlu detaylı açıklama",
@@ -25,20 +24,37 @@ export const generateListingContent = async (propertyData: any) => {
   `;
 
   try {
-    const encodedPrompt = encodeURIComponent(userPrompt);
-    const response = await fetch(`https://text.pollinations.ai/${encodedPrompt}?model=mistral&system=${encodeURIComponent(systemPrompt)}`);
+    const response = await fetch('https://text.pollinations.ai/', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        messages: [
+          { role: 'system', content: systemPrompt },
+          { role: 'user', content: userPrompt }
+        ],
+        model: 'mistral',
+        jsonMode: true
+      })
+    });
 
-    if (!response.ok) throw new Error('Yapay zeka servisi şu an yanıt vermiyor.');
-    
+    if (!response.ok) {
+      throw new Error(`AI Servisi Yanıt Vermedi (Hata: ${response.status})`);
+    }
+
     const text = await response.text();
-    // Extract JSON (sometimes models add extra text)
-    const jsonMatch = text.match(/\{[\s\S]*\}/);
-    if (!jsonMatch) throw new Error('Yapay zekadan geçersiz bir cevap geldi.');
     
+    // Attempt to extract JSON from the text response
+    const jsonMatch = text.match(/\{[\s\S]*\}/);
+    if (!jsonMatch) {
+      throw new Error('Yapay zekadan geçersiz bir format geldi. Lütfen tekrar deneyin.');
+    }
+
     return JSON.parse(jsonMatch[0]);
   } catch (error: any) {
     console.error("AI Generation Error:", error);
-    throw new Error(error.message || "İlan üretilirken bir hata oluştu.");
+    throw new Error(error.message || "İlan üretilirken beklenmedik bir sorun oluştu.");
   }
 };
 
