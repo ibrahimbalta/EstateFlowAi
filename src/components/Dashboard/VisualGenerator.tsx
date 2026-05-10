@@ -15,6 +15,62 @@ interface VisualGeneratorProps {
   onReset: () => void;
 }
 
+const ImageCard = ({ title, url, type }: { title: string, url: string, type: 'post' | 'story' }) => {
+  const [isLoading, setIsLoading] = useState(true);
+
+  return (
+    <div className="glass-card" style={{ padding: '16px' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+        <span style={{ fontSize: '14px', fontWeight: '600', display: 'flex', alignItems: 'center', gap: '8px' }}>
+          {type === 'post' ? <Camera size={16} /> : <Share2 size={16} />} {title}
+        </span>
+        <a href={url} download target="_blank" rel="noreferrer" style={{ color: 'var(--primary)', textDecoration: 'none' }}>
+          <Download size={16} />
+        </a>
+      </div>
+      
+      <div style={{ 
+        height: type === 'post' ? '300px' : '450px', 
+        borderRadius: '12px', 
+        border: '1px solid var(--border)', 
+        background: '#0a0a0a',
+        position: 'relative',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        overflow: 'hidden'
+      }}>
+        {isLoading && (
+          <div style={{ textAlign: 'center' }}>
+            <div className="loader-spinner" style={{ 
+              width: '40px', 
+              height: '40px', 
+              border: '3px solid rgba(255,255,255,0.1)', 
+              borderTopColor: 'var(--primary)', 
+              borderRadius: '50%', 
+              margin: '0 auto 12px',
+              animation: 'spin 1s linear infinite'
+            }} />
+            <p style={{ fontSize: '12px', color: 'var(--text-muted)' }}>Görsel Hazırlanıyor...</p>
+          </div>
+        )}
+        <img 
+          src={url} 
+          alt={title} 
+          onLoad={() => setIsLoading(false)}
+          style={{ 
+            width: '100%', 
+            height: '100%', 
+            objectFit: 'cover',
+            opacity: isLoading ? 0 : 1,
+            transition: 'opacity 0.3s ease'
+          }} 
+        />
+      </div>
+    </div>
+  );
+};
+
 const VisualGenerator: React.FC<VisualGeneratorProps> = ({ data, onReset }) => {
   const [copiedSection, setCopiedSection] = useState<string | null>(null);
 
@@ -50,39 +106,8 @@ const VisualGenerator: React.FC<VisualGeneratorProps> = ({ data, onReset }) => {
         </header>
 
         <section style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px' }}>
-          <div className="glass-card" style={{ padding: '16px' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
-              <span style={{ fontSize: '14px', fontWeight: '600', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <Camera size={16} /> Instagram / FB Post
-              </span>
-              <a href={data.postUrl} download target="_blank" style={{ color: 'var(--primary)', textDecoration: 'none' }}>
-                <Download size={16} />
-              </a>
-            </div>
-            <img 
-              src={data.postUrl} 
-              alt="Post Mockup" 
-              style={{ width: '100%', borderRadius: '12px', border: '1px solid var(--border)', minHeight: '300px', background: '#000' }} 
-            />
-          </div>
-
-          <div className="glass-card" style={{ padding: '16px' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
-              <span style={{ fontSize: '14px', fontWeight: '600', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <Share2 size={16} /> WhatsApp Story
-              </span>
-              <a href={data.storyUrl} download target="_blank" style={{ color: 'var(--primary)', textDecoration: 'none' }}>
-                <Download size={16} />
-              </a>
-            </div>
-            <div style={{ height: '320px', overflow: 'hidden', borderRadius: '12px', border: '1px solid var(--border)', background: '#000' }}>
-              <img 
-                src={data.storyUrl} 
-                alt="Story Mockup" 
-                style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
-              />
-            </div>
-          </div>
+          <ImageCard title="Instagram / FB Post" url={data.postUrl} type="post" />
+          <ImageCard title="WhatsApp Story" url={data.storyUrl} type="story" />
         </section>
 
         <section className="glass-card" style={{ padding: '24px' }}>

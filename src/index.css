@@ -88,6 +88,10 @@ input:focus, textarea:focus {
   animation: fadeIn 0.5s ease forwards;
 }
 
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
 /* Custom Scrollbar */
 ::-webkit-scrollbar {
   width: 8px;

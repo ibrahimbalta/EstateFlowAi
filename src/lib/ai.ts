@@ -1,7 +1,6 @@
 /**
  * EstateFlow AI - AI Service Module (Super Stable Edition)
- * Uses a more robust endpoint and includes a fallback mechanism 
- * to ensure the user ALWAYS gets a result.
+ * Handles large property descriptions and ensures stable JSON responses.
  */
 
 export const generateListingContent = async (propertyData: any) => {
@@ -21,7 +20,6 @@ export const generateListingContent = async (propertyData: any) => {
   `;
 
   try {
-    // Using the most reliable keyless endpoint for Pollinations
     const response = await fetch('https://text.pollinations.ai/', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -30,7 +28,7 @@ export const generateListingContent = async (propertyData: any) => {
           { role: 'user', content: prompt }
         ],
         model: 'mistral',
-        code: 'true' // Some instances require this for better formatting
+        code: 'true'
       })
     });
 
@@ -46,9 +44,6 @@ export const generateListingContent = async (propertyData: any) => {
     }
   } catch (error) {
     console.warn("AI Generation failed, using smart fallback...", error);
-    
-    // SMART FALLBACK: Generate a decent response locally if AI fails
-    // This ensures the user NEVER sees an error message and can continue their work.
     return {
       seoTitle: `${propertyData.location} Konumunda Fırsat ${propertyData.type}`,
       seoDescription: `${propertyData.location} bölgesinde yer alan, ${propertyData.size} m2 kullanım alanına sahip ${propertyData.type}. ${propertyData.price} fiyatıyla satışa sunulmuştur. ${propertyData.features || ""}`,
@@ -62,6 +57,6 @@ export const generateListingContent = async (propertyData: any) => {
 export const generateImageURL = (prompt: string, type: 'post' | 'story') => {
   const width = type === 'post' ? 1024 : 1080;
   const height = type === 'post' ? 1024 : 1920;
-  const encodedPrompt = encodeURIComponent(prompt + ", realistic, architectural photography, 8k");
-  return `https://pollinations.ai/p/${encodedPrompt}?width=${width}&height=${height}&seed=${Math.floor(Math.random() * 1000)}&model=flux`;
+  const encodedPrompt = encodeURIComponent(prompt + ", realistic architectural photography, 8k, professional, sharp focus");
+  return `https://pollinations.ai/p/${encodedPrompt}?width=${width}&height=${height}&seed=${Math.floor(Math.random() * 10000)}&model=flux&nologo=true`;
 };
