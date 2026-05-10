@@ -16,8 +16,9 @@ import '../../App.css';
 // Components
 import ListingForm from './ListingForm';
 import VisualGenerator from './VisualGenerator';
+import Templates from './Templates';
 
-type AppState = 'dashboard' | 'create' | 'result';
+type AppState = 'dashboard' | 'create' | 'result' | 'templates';
 
 function Dashboard() {
   const [activeTab, setActiveTab] = useState<AppState>('create');
@@ -92,7 +93,10 @@ function Dashboard() {
             <PlusCircle />
             Yeni İlan
           </button>
-          <button className="nav-item">
+          <button 
+            className={`nav-item ${activeTab === 'templates' ? 'active' : ''}`}
+            onClick={() => setActiveTab('templates')}
+          >
             <ImageIcon />
             Şablonlar
           </button>
@@ -175,6 +179,15 @@ function Dashboard() {
               exit={{ opacity: 0, y: -20 }}
             >
               <VisualGenerator data={listingData} onReset={() => setActiveTab('create')} />
+            </motion.div>
+          ) : activeTab === 'templates' ? (
+            <motion.div
+              key="templates"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+            >
+              <Templates />
             </motion.div>
           ) : (
             <div key="dashboard">
